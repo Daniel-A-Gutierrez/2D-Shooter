@@ -16,6 +16,7 @@ public class MakeP2 : MonoBehaviour
                 GetComponent<SpriteRenderer>().sprite = altSprite; 
                 gameObject.tag = "Player2";
                 GetComponent<NetController>().enemyTag = "Player1";
+                transform.position += transform.transform.right * 6;
             }
         }
     }

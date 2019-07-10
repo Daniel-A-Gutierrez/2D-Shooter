@@ -31,11 +31,7 @@ public class NetController : NetworkBehaviour
         {
             if(Input.GetKeyDown(shoot))
             {
-                GameObject b = Instantiate(bullet,transform.position + transform.right *offset,Quaternion.identity);
-                Bullet B = b.GetComponent<Bullet>();
-                B.Direction = transform.right;
-                B.hitsWhatTag = enemyTag;
-                rb2 = GetComponent<Rigidbody2D>();
+                CmdFire();
             }
 
 
@@ -70,11 +66,29 @@ public class NetController : NetworkBehaviour
 
     [SyncVar]
     public int hp;
-    [Client]
-    public void CmdDamageThis()
+
+    [Command]
+    void CmdFire()
+    {
+        RpcFireBullet();
+    }
+
+    [ClientRpc]
+    void RpcFireBullet()
+    {
+        GameObject b = Instantiate(bullet,transform.position + transform.right *offset,Quaternion.identity);
+        NetworkServer.Spawn(b);
+        Bullet B = b.GetComponent<Bullet>();
+        B.Direction = transform.right;
+        B.hitsWhatTag = enemyTag;
+    }
+
+    [ClientRpc]
+    public void RpcDamageThis()
     {
         hp--;
         if(hp<=0)
             Destroy(gameObject);
     }
+
 }

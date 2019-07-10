@@ -30,9 +30,37 @@ public class Bullet : NetworkBehaviour
 
     void OnCollisionEnter2D(Collision2D col)
     {
-        if(col.gameObject.tag == hitsWhatTag)
+        if(isServer)
         {
-            col.gameObject.GetComponent<NetController>().CmdDamageThis();
+            try
+            {
+                GameObject go = col.gameObject;
+                Destroy(gameObject);
+                if(go != null && go.tag == hitsWhatTag)
+                {
+                    go.GetComponent<NetController>().RpcDamageThis();
+                }
+            }
+            catch(System.Exception e) {}
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+
+
+
+    void Collide( NetworkIdentity ni)
+    {
+        if(ni != null)
+        {
+            GameObject go = GameObject.Find(ni.gameObject.name);
+            if(go != null && go.tag == hitsWhatTag)
+            {
+                go.GetComponent<NetController>().RpcDamageThis();
+            }
         }
         Destroy(gameObject);
     }
